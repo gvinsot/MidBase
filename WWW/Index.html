@@ -1,0 +1,24 @@
+﻿<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <script type="text/javascript" src="/script/silverscript.mootools.js"></script>
+    <script type="text/javascript" src="/script/silverscript.string.js"></script>
+    <script type="text/javascript" src="/script/silverscript.js"></script>
+</head>
+<body data-context="/viewmodels/Index.ashx">
+    <h1>TEST</h1>
+    <h2 data-binding="{Binding url}"></h2>
+    
+    <div data-context="{Binding sub}">
+
+        <a data-binding="{Binding test}"></a>
+
+        <div data-source="/viewmodels/GetItems.ashx?param1={Binding toto}" data-template="/views/myTemplate.html">
+
+        </div>
+    </div>
+
+
+</body>
+</html>
