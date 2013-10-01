@@ -18,7 +18,7 @@
 
             <a data-binding="{Binding test}"></a>
 
-            <div data-source="/viewmodels/GetItems.ashx?param1={Binding toto}" data-template="/views/myTemplate.html">
+            <div data-source="/viewmodels/GetItems.ashx?param1={Binding foo}" data-template="/views/myTemplate.html">
 
             </div>
         </div>

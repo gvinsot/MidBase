@@ -60,7 +60,7 @@ var TypeScriptTools;
             }
         };
         SilverTools.SetBindings = function SetBindings(rootNode) {
-            var childrenNodes = rootNode.childNodes;
+            var childrenNodes = rootNode.children;
             var nbChildren = childrenNodes.length;
             for(var i = 0; i < nbChildren; i++) {
                 var node = childrenNodes[i];
@@ -98,18 +98,19 @@ var TypeScriptTools;
                             contextExpression = contextExpression.replace(bindingString, transformed);
                         }
                     }
-                    new jQuery.ajax({
+                    jQuery.ajax({
                         async: false,
                         url: contextExpression,
-                        method: 'get',
-                        noCache: true,
-                        onSuccess: function (itemsArray) {
+                        type: 'GET',
+                        dataType: 'json',
+                        cache: false,
+                        success: function (itemsArray, text, jqXHR) {
                             contextNode["data-context-value"] = itemsArray;
                         },
-                        onFailure: function (ex) {
+                        error: function (ex) {
                             throw "Could not load data";
                         }
-                    }).send();
+                    });
                 } else if(elements != undefined) {
                     contextNode["data-context-value"] = SilverTools.EvaluateBinding(elements[0], parent, true);
                 } else {
@@ -186,6 +187,6 @@ var TypeScriptTools;
     })();
     TypeScriptTools.SilverTools = SilverTools;    
 })(TypeScriptTools || (TypeScriptTools = {}));
-window.onload = function () {
+$(function () {
     TypeScriptTools.SilverTools.SetBindings(document.body);
-};
+});

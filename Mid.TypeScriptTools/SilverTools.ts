@@ -104,13 +104,13 @@ module TypeScriptTools
             }
         }
 
-        static SetBindings(rootNode : Node) : void
+        static SetBindings(rootNode : HTMLElement) : void
         {
-            var childrenNodes = rootNode.childNodes;//.children;
+            var childrenNodes = rootNode.children;
             var nbChildren = childrenNodes.length;
             for (var i = 0; i < nbChildren; i++)
             {
-                var node = childrenNodes[i];
+                var node = <HTMLElement> childrenNodes[i];
                 node.Rebind();
                 TypeScriptTools.SilverTools.SetBindings(node);
             }
@@ -178,7 +178,7 @@ module TypeScriptTools
                 var isHttpLink = contextExpression.StartWith("/") || contextExpression.StartWith("http://");
 
                 var elements = bindingRegex.exec(contextExpression);
-                var parent = contextNode.parentNode;//.getParent();
+                var parent = contextNode.parentNode;
 
                 if (isHttpLink == true)
                 {
@@ -194,21 +194,26 @@ module TypeScriptTools
                         }
                     }
 
-                    new jQuery.ajax
-                    ({
+                    jQuery.ajax
+                    ({                        
                         async: false,
                         url: contextExpression,
-                        method: 'get',
-                        noCache: true,
-                        onSuccess: function (itemsArray)
+                        type: 'GET',
+                        dataType:'json',
+                        cache:false,
+                        success: function (itemsArray, text, jqXHR)
                         {
                             contextNode["data-context-value"] = itemsArray;
                         },
-                        onFailure: function (ex)
+                        error: function (ex)
                         {
                             throw "Could not load data";
-                        }
-                    }).send();
+                        },
+                        //complete:function(data,xhr)
+                        //{
+
+                        //}
+                    });
                 }
                 else if (elements != undefined)
                 {
@@ -318,8 +323,8 @@ module TypeScriptTools
     }
 }
 
-$(document).ready = ()=> 
+$(()=> 
 {
     TypeScriptTools.SilverTools.SetBindings(document.body);
-};
+});
 

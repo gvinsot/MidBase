@@ -10,6 +10,18 @@ namespace WWW.ViewModels
     /// </summary>
     public class Test : IHttpHandler
     {
+        public class toto
+        {
+            public string url = "toto";
+            public titi sub = new titi();
+
+        }
+
+        public class titi
+        {
+            public string test = "test 2";
+            public string foo = "test 3";
+        }
 
         public void ProcessRequest(HttpContext context)
         {
@@ -29,7 +41,8 @@ namespace WWW.ViewModels
                 context.Response.DisableKernelCache();
                 context.Response.ContentType = "application/json";
 
-                context.Response.Write(Factory<ISerializationTool>.New().Serialize(new Test()));
+                var result = Factory<ISerializationTool>.New().Serialize(new toto());
+                context.Response.Write(result);
             }
         }
 
