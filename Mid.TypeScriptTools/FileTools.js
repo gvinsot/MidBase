@@ -1,8 +1,12 @@
+///<reference path="jquery.d.ts"/>
+// Module
 var TypeScriptTools;
 (function (TypeScriptTools) {
+    //Class
     var FileTools = (function () {
-        function FileTools() { }
-        FileTools.FileExist = function FileExist(path) {
+        function FileTools() {
+        }
+        FileTools.FileExist = function (path) {
             var result = false;
             jQuery.ajax({
                 type: "GET",
@@ -21,14 +25,18 @@ var TypeScriptTools;
             });
             return result;
         };
-        FileTools.PathCombine = function PathCombine(path1, path2) {
+
+        FileTools.PathCombine = function (path1, path2) {
             return path1 + path2;
         };
-        FileTools.UrlCombine = function UrlCombine(absolteUrl, relativeUrl) {
+
+        FileTools.UrlCombine = function (absolteUrl, relativeUrl) {
             return absolteUrl + relativeUrl;
         };
-        FileTools.ReadJsonFile = function ReadJsonFile(path) {
+
+        FileTools.ReadJsonFile = function (path) {
             var queryResult;
+
             jQuery.ajax({
                 type: "GET",
                 url: path,
@@ -41,47 +49,10 @@ var TypeScriptTools;
                     queryResult = "ERROR : " + msg;
                 }
             });
+
             return jQuery.parseJSON(queryResult);
-        };
-        FileTools.StartWith = function StartWith(toTest, toSearch) {
-            for(var i = 0; i < toSearch.length; i++) {
-                if(toSearch.charAt(i) != toTest.charAt(i)) {
-                    return false;
-                }
-            }
-            return true;
-        };
-        FileTools.EndWith = function EndWith(toTest, toSearch) {
-            var toTestIndex = toTest.length - 1;
-            for(var i = toSearch.length - 1; i >= 0; i--) {
-                if(toSearch.charAt(i) != toTest.charAt(toTestIndex)) {
-                    return false;
-                }
-                toTestIndex--;
-            }
-            return true;
-        };
-        FileTools.TrimStart = function TrimStart(original, toTrim) {
-            var result = original;
-            while(this.StartWith(result, toTrim)) {
-                result = FileTools.TrimStartOnce(result, toTrim);
-            }
-            return result;
-        };
-        FileTools.TrimStartOnce = function TrimStartOnce(original, toTrim) {
-            return original.substring(toTrim.length, original.length);
-        };
-        FileTools.TrimEnd = function TrimEnd(original, toTrim) {
-            var result = original;
-            while(this.EndWith(result, toTrim)) {
-                result = FileTools.TrimEndOnce(result, toTrim);
-            }
-            return result;
-        };
-        FileTools.TrimEndOnce = function TrimEndOnce(original, toTrim) {
-            return original.substring(0, original.length - toTrim.length);
         };
         return FileTools;
     })();
-    TypeScriptTools.FileTools = FileTools;    
+    TypeScriptTools.FileTools = FileTools;
 })(TypeScriptTools || (TypeScriptTools = {}));

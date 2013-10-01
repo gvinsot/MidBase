@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <ProjectGuid>{2E02DFDC-940B-4530-B1C9-39E368F0AE08}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -9,29 +10,57 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <UseIISExpress>false</UseIISExpress>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
   </PropertyGroup>
   <PropertyGroup>
     <RootNamespace>Mid.TypeScriptTools</RootNamespace>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptIncludeComments>false</TypeScriptIncludeComments>
+    <TypeScriptSourceMap>false</TypeScriptSourceMap>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
     <PackageAsSingleFile>false</PackageAsSingleFile>
     <PublishDatabases>false</PublishDatabases>
+    <TypeScriptSourceMap> --sourcemap</TypeScriptSourceMap>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
+    <TypeScriptIncludeComments>true</TypeScriptIncludeComments>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="EventHandler.js">
       <DependentUpon>EventHandler.ts</DependentUpon>
     </Content>
+    <Content Include="EventHandler.min.js">
+      <DependentUpon>EventHandler.ts</DependentUpon>
+    </Content>
     <Content Include="FileTools.js">
+      <DependentUpon>FileTools.ts</DependentUpon>
+    </Content>
+    <Content Include="FileTools.min.js">
       <DependentUpon>FileTools.ts</DependentUpon>
     </Content>
     <Content Include="ObjectTools.js">
       <DependentUpon>ObjectTools.ts</DependentUpon>
     </Content>
+    <Content Include="SilverTools.min.js">
+      <DependentUpon>SilverTools.ts</DependentUpon>
+    </Content>
     <Content Include="UiTools.js">
       <DependentUpon>UiTools.ts</DependentUpon>
     </Content>
-    <TypeScriptCompile Include="UiTools.ts" />
-    <TypeScriptCompile Include="QueryStringTools.ts" />
+    <Content Include="UiTools.min.js">
+      <DependentUpon>UiTools.ts</DependentUpon>
+    </Content>
     <Content Include="QueryStringTools.js">
       <DependentUpon>QueryStringTools.ts</DependentUpon>
     </Content>
@@ -44,13 +73,24 @@
     <TypeScriptCompile Include="StringTools.ts" />
     <TypeScriptCompile Include="SilverTools.ts" />
     <TypeScriptCompile Include="jquery.d.ts" />
-    <TypeScriptCompile Include="jqueryui.d.ts" />
     <TypeScriptCompile Include="EventHandler.ts" />
     <TypeScriptCompile Include="FileTools.ts" />
     <TypeScriptCompile Include="ObjectTools.ts" />
+    <TypeScriptCompile Include="UiTools.ts" />
+    <TypeScriptCompile Include="QueryStringTools.ts" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="SilverTools.js.map">
+      <DependentUpon>SilverTools.ts</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
@@ -74,9 +114,9 @@
     <Message Text="Compiling TypeScript files" />
     <Message Text="Executing tsc$(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
     <Message Text="Executing tsc --target ES5 $(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
-    <Exec Command="tsc --target ES5 $(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+    <Exec Command="&quot;$(PROGRAMFILES)\Microsoft SDKs\TypeScript\tsc&quot; --declaration @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" IgnoreExitCode="true" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy $(ProjectDir)*.js $(SolutionDir)Digital.WWW\scripts</PostBuildEvent>
+    <PostBuildEvent>copy /Y "$(ProjectDir)*.js" "$(SolutionDir)Digital.WWW\scripts\"</PostBuildEvent>
   </PropertyGroup>
 </Project>

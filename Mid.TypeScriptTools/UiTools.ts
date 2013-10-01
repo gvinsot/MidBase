@@ -1,11 +1,11 @@
-
+ï»¿
 //define regxps
 
 //var regexp_email = "[A-Za-z0-9_-]+(.[A-Za-z0-9_-])*@([A-Za-z0-9-]+\\.)+[A-Za-z]{2,5}$";
 //var regexp_notempty = "^.+$";
-//var regexp_titleformat = "^[^/\";\\[\\]{}()_#~µ*¤@<>^\\\\§]{4,}$";
-//var regexp_pseudo = "^[^/\";\\[\\]{}()_#~µ*¤@<>^\\\\§]{2,}$";
-//var regexp_password = "^[^/\";\\[\\]{}()_#~µ*¤@<>^\\\\§]{6,}$";
+//var regexp_titleformat = "^[^/\";\\[\\]{}()_#~Âµ*Â¤@<>^\\\\Â§]{4,}$";
+//var regexp_pseudo = "^[^/\";\\[\\]{}()_#~Âµ*Â¤@<>^\\\\Â§]{2,}$";
+//var regexp_password = "^[^/\";\\[\\]{}()_#~Âµ*Â¤@<>^\\\\Â§]{6,}$";
 //var regexp_chaine = "^([/w]+)$";
 //var regexp_number = "^[0-9]+$";
 //var regexp_zipCode = "^[0-9]{4,}$";

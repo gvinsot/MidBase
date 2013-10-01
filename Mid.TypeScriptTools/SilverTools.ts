@@ -1,37 +1,47 @@
 ///<reference path="StringTools.ts" />
 ///<reference path="jquery.d.ts" />
 
-interface Element
+interface Object
 {
    RaisePropertyChanged : (string) => void;
+   Rebind : () => void;
+   ApplyTemplate : () => void;
 }
 
-interface Node 
-{
-  Rebind : () => void;
-  ApplyTemplate : () => void;
-}
+Object.prototype.Rebind= function ():void
+    { 
+        if (this.attributes["data-binding"] != undefined)
+        {
+            TypeScriptTools.SilverTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
+        }
+    };
 
-Node.prototype.Rebind = function ():void
-{
-    if (this.attributes["data-binding"] != undefined)
+$.extend(Object.prototype, {
+    Rebind: function (): void
     {
-        TypeScriptTools.SilverTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
+        if (this.attributes["data-binding"] != undefined)
+        {
+            TypeScriptTools.SilverTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
+        }
     }
-};
+});
 
-Node.prototype.ApplyTemplate = function ():void
-{
-    if (this.attributes["data-template"] != undefined)
+$.extend(Object.prototype, {
+    ApplyTemplate: function (): void
     {
-        TypeScriptTools.SilverTools.EvaluateTemplate(this.attributes["data-template"].nodeValue, this);
+        if (this.attributes["data-template"] != undefined)
+        {
+            TypeScriptTools.SilverTools.EvaluateTemplate(this.attributes["data-template"].nodeValue, this);
+        }
     }
-};
+});
 
-Element.prototype.RaisePropertyChanged = function (propertyName:string):void
-{
-    
-};
+$.extend(Object.prototype, {
+    RaisePropertyChanged: function (): void
+    {
+        //TODO
+    }
+});
 
 
 module TypeScriptTools
@@ -49,13 +59,13 @@ module TypeScriptTools
                 this.CurrentBindingId++;
                 bindedObject["BindingId"] = this.CurrentBindingId.toString();
             }
-            var bindingObjectID = bindedObject["BindingId"];
-            if (this.BindingDictionary[bindingObjectID] == undefined)
+            var bindingObjectId = bindedObject["BindingId"];
+            if (this.BindingDictionary[bindingObjectId] == undefined)
             {
-                this.BindingDictionary[bindingObjectID] = new Object();
+                this.BindingDictionary[bindingObjectId] = new Object();
             }
 
-            var bindingDictionarySubStructure = this.BindingDictionary[bindingObjectID];
+            var bindingDictionarySubStructure = this.BindingDictionary[bindingObjectId];
 
             var binding =
                 {
@@ -69,23 +79,27 @@ module TypeScriptTools
             }
 
             bindingDictionarySubStructure[path].append(binding);
-        };
+        }
+
         RemoveBinding (bindedObject, path, node)
         {
             // this.BindingDictionary[bindedObject["BindingId"]].
-        };
+        }
+
         RemoveObjectBindings(bindedObject, path, node)
         {
             // this.BindingDictionary[bindedObject["BindingId"]].
-        };
+        }
+
         RemoveNodeBindings(bindedObject, path, node)
         {
             // this.BindingDictionary[bindedObject["BindingId"]].
-        };
-            RaisePropertyChanged(changedObject, changedPath)
+        }
+
+        RaisePropertyChanged(changedObject, changedPath)
         {
                 // this.BindingDictionary[bindedObject["BindingId"]].
-            };
+        }
     }
 
 
@@ -160,11 +174,11 @@ module TypeScriptTools
             // replace item of template with Name=PART_Content with the content of the item
         }
 
-        static bindingRegex = new RegExp("^\{Binding [^}]+\}");
+        static BindingRegex = new RegExp("^\{Binding [^}]+\}");
 
         static EvaluateDataContext(node, isCalledFromDataContext)
         {
-            var contextNode = GetParentContext(node);
+            var contextNode = SilverTools.GetParentContext(node);
 
             if (!isCalledFromDataContext && contextNode.attributes["data-context-value"] != undefined)
             {
@@ -177,7 +191,7 @@ module TypeScriptTools
 
                 var isHttpLink = contextExpression.StartWith("/") || contextExpression.StartWith("http://");
 
-                var elements = bindingRegex.exec(contextExpression);
+                var elements = SilverTools.BindingRegex.exec(contextExpression);
                 var parent = contextNode.parentNode;
 
                 if (isHttpLink == true)
@@ -201,7 +215,7 @@ module TypeScriptTools
                         type: 'GET',
                         dataType:'json',
                         cache:false,
-                        success: function (itemsArray, text, jqXHR)
+                        success: function (itemsArray)
                         {
                             contextNode["data-context-value"] = itemsArray;
                         },
@@ -217,7 +231,7 @@ module TypeScriptTools
                 }
                 else if (elements != undefined)
                 {
-                    contextNode["data-context-value"] = EvaluateBinding(elements[0], parent, true);
+                    contextNode["data-context-value"] = SilverTools.EvaluateBinding(elements[0], parent, true);
                 }
                 else
                 {
@@ -228,9 +242,9 @@ module TypeScriptTools
         }
 
 
-        public static EvaluateBinding(bindingExpression :string, node : Node, isCalledFromDataContext : bool) : any
+        public static EvaluateBinding(bindingExpression :string, node : Node, isCalledFromDataContext : boolean) : any
         {
-            var dataContextObject = EvaluateDataContext(node, isCalledFromDataContext);
+            var dataContextObject = SilverTools.EvaluateDataContext(node, isCalledFromDataContext);
 
             var parametersString = bindingExpression.TrimStartOnce("{Binding").TrimStartOnce(" ");
             parametersString = parametersString.TrimEndOnce("}");
@@ -262,7 +276,7 @@ module TypeScriptTools
                             source = document.getElementsByName(param[1]);
                             break;
                         case "Source":
-                            source = EvaluateBinding(param[1], node, false);
+                            source = SilverTools.EvaluateBinding(param[1], node, false);
                             break;
                         case "Destination":
                             destination = param[1];
@@ -289,14 +303,15 @@ module TypeScriptTools
                             break;
                     }
             }
+            var value;
 
             if (source != undefined)
             {
-                var value = source[path];
+                value = source[path];
             }
             else
             {
-                var value = source;
+                value = source;
             }
             //todo : apply converter and stringformat
 

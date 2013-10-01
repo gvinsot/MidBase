@@ -1,18 +1,23 @@
+///
 
 // Module
 module TypeScriptTools 
 {
+    export interface delegate
+    {
+        (): void;
+    }
 
     // Class
     export class EventHandler
     {
-        private _invocationList: Object[] = [];
+        private _invocationList: delegate[] = [];
         // Constructor
         constructor () 
         { 
         }
 
-        public Attach(delegateMethod: Object):void
+        public Attach(delegateMethod: delegate):void
         {
             this._invocationList[this._invocationList.length] = delegateMethod;
         }
