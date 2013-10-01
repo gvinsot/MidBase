@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{A41981ED-3C06-421F-840F-221265C41ADB}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <OutputPath>bin</OutputPath>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <UseIISExpress>false</UseIISExpress>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>WWW</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="app.css" />
+    <Content Include="app.js">
+      <DependentUpon>app.ts</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="app.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Digital.Managers\Digital.Managers.csproj">
+      <Project>{767E025A-4071-4B9E-85AB-7E14DF89EBAC}</Project>
+      <Name>Digital.Managers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mid.OAuth\OAuth2Provider\OAuth2Provider.csproj">
+      <Project>{FC4244BA-992C-46CF-926F-B4B777363428}</Project>
+      <Name>OAuth2Provider</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mid.Tools\Mid.Tools.csproj">
+      <Project>{2D63B715-9ABA-4946-BB1C-8D6B9C0FE508}</Project>
+      <Name>Mid.Tools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="index.aspx" />
+    <Content Include="viewmodels\MediaService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="index.aspx.cs">
+      <DependentUpon>index.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="viewmodels\Authentication\OAuthServiceLocator.cs" />
+    <Compile Include="viewmodels\Authentication\OAuthAccessToken.ashx.cs">
+      <DependentUpon>OAuthAccessToken.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\Authentication\OAuthAuthorize.ashx.cs">
+      <DependentUpon>OAuthAuthorize.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\Authentication\OAuthRegister.ashx.cs">
+      <DependentUpon>OAuthRegister.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\Authentication\OAuthRequestToken.ashx.cs">
+      <DependentUpon>OAuthRequestToken.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\GroupCollectionService.ashx.cs">
+      <DependentUpon>GroupCollectionService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\GroupService.ashx.cs">
+      <DependentUpon>GroupService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\MediaCollectionService.ashx.cs">
+      <DependentUpon>MediaCollectionService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\MediaService.ashx.cs">
+      <DependentUpon>MediaService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\PlaylistCollectionService.ashx.cs">
+      <DependentUpon>PlaylistCollectionService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\PlaylistService.ashx.cs">
+      <DependentUpon>PlaylistService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\TagCollectionService.ashx.cs">
+      <DependentUpon>TagCollectionService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\TagService.ashx.cs">
+      <DependentUpon>TagService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\Test.ashx.cs">
+      <DependentUpon>Test.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\UserCollectionService.ashx.cs">
+      <DependentUpon>UserCollectionService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\UserService.ashx.cs">
+      <DependentUpon>UserService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\WorkgroupCollectionService.ashx.cs">
+      <DependentUpon>WorkgroupCollectionService.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="viewmodels\WorkgroupService.ashx.cs">
+      <DependentUpon>WorkgroupService.ashx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\PlaylistService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\TagService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\UserService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\WorkgroupService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\GroupService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\Authentication\OAuthRegister.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\Authentication\OAuthRequestToken.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\Authentication\OAuthAuthorize.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\Authentication\OAuthAccessToken.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\MediaCollectionService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\PlaylistCollectionService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\TagCollectionService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\UserCollectionService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\WorkgroupCollectionService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\GroupCollectionService.ashx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="scripts\" />
+    <Folder Include="styles\" />
+    <Folder Include="views\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Web.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="viewmodels\Test.ashx" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>59887</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <Target Name="BeforeBuild">
+    <Message Text="Compiling TypeScript files" />
+    <Message Text="Executing tsc$(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+    <Message Text="Executing tsc --target ES5 $(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+    <Exec Command="tsc --target ES5 $(TypeScriptSourceMap) @(TypeScriptCompile ->'&quot;%(fullpath)&quot;', ' ')" />
+  </Target>
+</Project>
