@@ -14,7 +14,12 @@
     <RootNamespace>WWW</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="app.css" />
+    <Content Include="scripts\EventHandler.js" />
+    <Content Include="scripts\FileTools.js" />
+    <Content Include="scripts\ObjectTools.js" />
+    <Content Include="scripts\SilverTools.js" />
+    <Content Include="scripts\StringTools.js" />
+    <Content Include="styles\app.css" />
     <Content Include="app.js">
       <DependentUpon>app.ts</DependentUpon>
     </Content>
@@ -153,8 +158,6 @@
     <Content Include="viewmodels\GroupCollectionService.ashx" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="scripts\" />
-    <Folder Include="styles\" />
     <Folder Include="views\" />
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@
     <head>
         <meta charset="utf-8" />
         <title>SilverScript HTML App</title>
-        <!--link rel="stylesheet" href="app.css" type="text/css" /-->
+        <link rel="stylesheet" href="styles/app.css" type="text/css" />
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.8.0.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/ui/1.8.23/jquery-ui.js"></script>
         <%=Scripts%>
