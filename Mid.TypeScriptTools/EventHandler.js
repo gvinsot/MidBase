@@ -1,29 +1,23 @@
-///
-// Module
 var TypeScriptTools;
 (function (TypeScriptTools) {
-    // Class
     var EventHandler = (function () {
-        // Constructor
         function EventHandler() {
             this._invocationList = [];
         }
         EventHandler.prototype.Attach = function (delegateMethod) {
             this._invocationList[this._invocationList.length] = delegateMethod;
         };
-
         EventHandler.prototype.Dettach = function (delegateMethod) {
-            for (var key in this._invocationList) {
-                if (this._invocationList[key] == delegateMethod) {
+            for(var key in this._invocationList) {
+                if(this._invocationList[key] == delegateMethod) {
                     this._invocationList[key] = null;
                 }
             }
         };
-
         EventHandler.prototype.FireEvent = function () {
-            for (var invocationKey in this._invocationList) {
+            for(var invocationKey in this._invocationList) {
                 var invocation = this._invocationList[invocationKey];
-                if (invocation != null) {
+                if(invocation != null) {
                     try  {
                         invocation();
                     } catch (ex) {
@@ -33,12 +27,11 @@ var TypeScriptTools;
                 invocation = null;
             }
         };
-
         EventHandler.prototype.Dispose = function () {
             this._invocationList = null;
             this._invocationList = [];
         };
         return EventHandler;
     })();
-    TypeScriptTools.EventHandler = EventHandler;
+    TypeScriptTools.EventHandler = EventHandler;    
 })(TypeScriptTools || (TypeScriptTools = {}));

@@ -1,12 +1,8 @@
-///<reference path="jquery.d.ts"/>
-// Module
 var TypeScriptTools;
 (function (TypeScriptTools) {
-    //Class
     var FileTools = (function () {
-        function FileTools() {
-        }
-        FileTools.FileExist = function (path) {
+        function FileTools() { }
+        FileTools.FileExist = function FileExist(path) {
             var result = false;
             jQuery.ajax({
                 type: "GET",
@@ -25,18 +21,14 @@ var TypeScriptTools;
             });
             return result;
         };
-
-        FileTools.PathCombine = function (path1, path2) {
+        FileTools.PathCombine = function PathCombine(path1, path2) {
             return path1 + path2;
         };
-
-        FileTools.UrlCombine = function (absolteUrl, relativeUrl) {
+        FileTools.UrlCombine = function UrlCombine(absolteUrl, relativeUrl) {
             return absolteUrl + relativeUrl;
         };
-
-        FileTools.ReadJsonFile = function (path) {
+        FileTools.ReadJsonFile = function ReadJsonFile(path) {
             var queryResult;
-
             jQuery.ajax({
                 type: "GET",
                 url: path,
@@ -46,13 +38,12 @@ var TypeScriptTools;
                     queryResult = result;
                 },
                 error: function (msg) {
-                    queryResult = "ERROR : " + msg;
+                    throw new Error(msg);
                 }
             });
-
-            return jQuery.parseJSON(queryResult);
+            return queryResult;
         };
         return FileTools;
     })();
-    TypeScriptTools.FileTools = FileTools;
+    TypeScriptTools.FileTools = FileTools;    
 })(TypeScriptTools || (TypeScriptTools = {}));

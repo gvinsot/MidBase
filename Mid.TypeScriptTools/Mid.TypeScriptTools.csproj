@@ -49,11 +49,15 @@
     <Content Include="FileTools.min.js">
       <DependentUpon>FileTools.ts</DependentUpon>
     </Content>
+    <TypeScriptCompile Include="Interfaces.ts" />
+    <Content Include="Interfaces.js">
+      <DependentUpon>Interfaces.ts</DependentUpon>
+    </Content>
     <Content Include="ObjectTools.js">
       <DependentUpon>ObjectTools.ts</DependentUpon>
     </Content>
     <Content Include="SilverTools.min.js">
-      <DependentUpon>SilverTools.ts</DependentUpon>
+      <DependentUpon>BindingTools.ts</DependentUpon>
     </Content>
     <Content Include="UiTools.js">
       <DependentUpon>UiTools.ts</DependentUpon>
@@ -68,10 +72,10 @@
       <DependentUpon>StringTools.ts</DependentUpon>
     </Content>
     <Content Include="SilverTools.js">
-      <DependentUpon>SilverTools.ts</DependentUpon>
+      <DependentUpon>BindingTools.ts</DependentUpon>
     </Content>
     <TypeScriptCompile Include="StringTools.ts" />
-    <TypeScriptCompile Include="SilverTools.ts" />
+    <TypeScriptCompile Include="BindingTools.ts" />
     <TypeScriptCompile Include="jquery.d.ts" />
     <TypeScriptCompile Include="EventHandler.ts" />
     <TypeScriptCompile Include="FileTools.ts" />
@@ -81,7 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="SilverTools.js.map">
-      <DependentUpon>SilverTools.ts</DependentUpon>
+      <DependentUpon>BindingTools.ts</DependentUpon>
     </Content>
   </ItemGroup>
   <PropertyGroup>

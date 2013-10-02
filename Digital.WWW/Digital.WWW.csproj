@@ -26,12 +26,6 @@
     <Content Include="scripts\SilverTools.js" />
     <Content Include="scripts\StringTools.js" />
     <Content Include="styles\app.css" />
-    <Content Include="app.js">
-      <DependentUpon>app.ts</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptCompile Include="app.ts" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Digital.Managers\Digital.Managers.csproj">

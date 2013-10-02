@@ -22,7 +22,7 @@ module TypeScriptTools
             this._invocationList[this._invocationList.length] = delegateMethod;
         }
 
-        public Dettach(delegateMethod: Object):void
+        public Dettach(delegateMethod: delegate):void
         {
             for (var key in this._invocationList)
             {

@@ -1,26 +1,3 @@
-Object.prototype.Rebind = function () {
-    if(this.attributes["data-binding"] != undefined) {
-        TypeScriptTools.BindingTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
-    }
-};
-$.extend(Object.prototype, {
-    Rebind: function () {
-        if(this.attributes["data-binding"] != undefined) {
-            TypeScriptTools.BindingTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
-        }
-    }
-});
-$.extend(Object.prototype, {
-    ApplyTemplate: function () {
-        if(this.attributes["data-template"] != undefined) {
-            TypeScriptTools.BindingTools.EvaluateTemplate(this.attributes["data-template"].nodeValue, this);
-        }
-    }
-});
-$.extend(Object.prototype, {
-    RaisePropertyChanged: function () {
-    }
-});
 var TypeScriptTools;
 (function (TypeScriptTools) {
     var BindingGlobalContext = (function () {
@@ -62,21 +39,32 @@ var TypeScriptTools;
     var BindingTools = (function () {
         function BindingTools() { }
         BindingTools.Bindings = new BindingGlobalContext();
-        BindingTools.SetTemplates = function SetTemplates(rootNode) {
+        BindingTools.prototype.ApplyBinding = function (rootNode) {
+            if(rootNode.attributes["data-binding"] != undefined) {
+                TypeScriptTools.BindingTools.EvaluateBinding(rootNode.attributes["data-binding"]["nodeValue"], rootNode, false);
+            }
+        };
+        BindingTools.prototype.ApplyTemplate = function (rootNode) {
+            if(rootNode.attributes["data-template"] != undefined) {
+                TypeScriptTools.BindingTools.EvaluateTemplate(rootNode.attributes["data-template"].nodeValue, rootNode);
+            }
+        };
+        BindingTools.SetTemplatesRecursively = function SetTemplatesRecursively(rootNode) {
+            TypeScriptTools.BindingTools.ApplyTemplate(rootNode);
             var els = rootNode.getElementsByTagName("*");
             var l = els.length;
             for(var x = 0; x < l; x++) {
                 var node = els[x];
-                node.ApplyTemplate();
+                TypeScriptTools.BindingTools.SetTemplatesRecursively(node);
             }
         };
-        BindingTools.SetBindings = function SetBindings(rootNode) {
+        BindingTools.SetBindingsRecursively = function SetBindingsRecursively(rootNode) {
+            TypeScriptTools.BindingTools.ApplyBinding(rootNode);
             var childrenNodes = rootNode.children;
             var nbChildren = childrenNodes.length;
             for(var i = 0; i < nbChildren; i++) {
                 var node = childrenNodes[i];
-                node.Rebind();
-                TypeScriptTools.BindingTools.SetBindings(node);
+                TypeScriptTools.BindingTools.SetBindingsRecursively(node);
             }
         };
         BindingTools.GetParentContext = function GetParentContext(node) {
@@ -109,19 +97,7 @@ var TypeScriptTools;
                             contextExpression = contextExpression.replace(bindingString, transformed);
                         }
                     }
-                    jQuery.ajax({
-                        async: false,
-                        url: contextExpression,
-                        type: 'GET',
-                        dataType: 'json',
-                        cache: false,
-                        success: function (itemsArray) {
-                            contextNode["data-context-value"] = itemsArray;
-                        },
-                        error: function (ex) {
-                            throw "Could not load data";
-                        }
-                    });
+                    contextNode["data-context-value"] = TypeScriptTools.FileTools.ReadJsonFile(contextExpression);
                 } else if(elements != undefined) {
                     contextNode["data-context-value"] = BindingTools.EvaluateBinding(elements[0], parent, true);
                 } else {
@@ -200,5 +176,6 @@ var TypeScriptTools;
     TypeScriptTools.BindingTools = BindingTools;    
 })(TypeScriptTools || (TypeScriptTools = {}));
 $(function () {
-    TypeScriptTools.BindingTools.SetBindings(document.body);
+    TypeScriptTools.BindingTools.SetBindingsRecursively(document.body);
+    TypeScriptTools.BindingTools.SetTemplatesRecursively(document.body);
 });

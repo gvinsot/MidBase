@@ -1,51 +1,51 @@
 ///<reference path="StringTools.ts" />
 ///<reference path="jquery.d.ts" />
-
-interface Object
-{
-   RaisePropertyChanged : (string) => void;
-   Rebind : () => void;
-   ApplyTemplate : () => void;
-}
-
-Object.prototype.Rebind= function ():void
-    { 
-        if (this.attributes["data-binding"] != undefined)
-        {
-            TypeScriptTools.SilverTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
-        }
-    };
-
-$.extend(Object.prototype, {
-    Rebind: function (): void
-    {
-        if (this.attributes["data-binding"] != undefined)
-        {
-            TypeScriptTools.SilverTools.EvaluateBinding(this.attributes["data-binding"]["nodeValue"], this, false);
-        }
-    }
-});
-
-$.extend(Object.prototype, {
-    ApplyTemplate: function (): void
-    {
-        if (this.attributes["data-template"] != undefined)
-        {
-            TypeScriptTools.SilverTools.EvaluateTemplate(this.attributes["data-template"].nodeValue, this);
-        }
-    }
-});
-
-$.extend(Object.prototype, {
-    RaisePropertyChanged: function (): void
-    {
-        //TODO
-    }
-});
-
+///<reference path="EventHandler.ts" />
 
 module TypeScriptTools
 {
+
+    export class Binding implements IDisposable
+    {
+        public Path: string;
+        public Node: HTMLElement;
+        private _bindedObject: any;
+
+        get BindedObject()
+        {
+            return this._bindedObject;
+        }
+        set BindedObject(value)
+        {                        
+            this._bindedObject = value;
+
+            if (value.PropertyChanged != undefined)
+            {
+                (<EventHandler> value.PropertyChanged).Attach(this.UpdateNodeOnContextChange);
+            }
+        }
+
+        UpdateNodeOnContextChange():void
+        {
+            TypeScriptTools.BindingTools.ApplyBinding(this.Node);
+        }
+
+        constructor (path: string, node: HTMLElement, bindedObject: any)
+        {
+            this.Path = path;
+            this.Node = node;
+            this.BindedObject = bindedObject;
+        }
+
+        public Dispose(): void
+        { 
+            if (this._bindedObject.PropertyChanged != undefined)
+            {
+                (<EventHandler> this._bindedObject).Dettach(this.UpdateNodeOnContextChange);
+            }
+        }
+    }
+
     export class BindingGlobalContext
     {
         BindingDictionary:any = new Object();
@@ -54,83 +54,79 @@ module TypeScriptTools
 
         AddBinding(bindedObject : any, path : string, node:HTMLElement):void
         {
-            if (bindedObject["BindingId"] == undefined)
+            if (node["BindingId"] == undefined)
             {
                 this.CurrentBindingId++;
-                bindedObject["BindingId"] = this.CurrentBindingId.toString();
+                node["BindingId"] = this.CurrentBindingId;
             }
-            var bindingObjectId = bindedObject["BindingId"];
-            if (this.BindingDictionary[bindingObjectId] == undefined)
-            {
-                this.BindingDictionary[bindingObjectId] = new Object();
-            }
+            var bindingId = node["BindingId"];
 
-            var bindingDictionarySubStructure = this.BindingDictionary[bindingObjectId];
+            var binding = new Binding(path, node, bindedObject);
 
-            var binding =
-                {
-                    Path: path,
-                    Node: node,
-                    BindedObject: bindedObject
-                };
-            if (bindingDictionarySubStructure[path] == undefined)
-            {
-                bindingDictionarySubStructure[path] = new Array();
-            }
-
-            bindingDictionarySubStructure[path].append(binding);
+            this.BindingDictionary[bindingId]=binding;
         }
 
         RemoveBinding (bindedObject, path, node)
         {
-            // this.BindingDictionary[bindedObject["BindingId"]].
-        }
-
-        RemoveObjectBindings(bindedObject, path, node)
-        {
-            // this.BindingDictionary[bindedObject["BindingId"]].
-        }
-
-        RemoveNodeBindings(bindedObject, path, node)
-        {
-            // this.BindingDictionary[bindedObject["BindingId"]].
-        }
-
-        RaisePropertyChanged(changedObject, changedPath)
-        {
-                // this.BindingDictionary[bindedObject["BindingId"]].
+            if (node["BindingId"] != undefined)
+            {
+                var bindingId = node["BindingId"];
+                var binding = <Binding> this.BindingDictionary[bindingId];
+                binding.Dispose();
+                binding = null;
+                this.BindingDictionary[bindingId] = null;                
+            }
         }
     }
 
 
-    export class SilverTools
+    export class BindingTools
     {
         public static Bindings : BindingGlobalContext = new BindingGlobalContext();
 
-        static SetTemplates (rootNode : HTMLElement) : void
+
+        public ApplyBinding(rootNode: HTMLElement):void
         {
+            if (rootNode.attributes["data-binding"] != undefined)
+            {
+                TypeScriptTools.BindingTools.EvaluateBinding(rootNode.attributes["data-binding"]["nodeValue"], rootNode, false);
+            }
+        }
+
+        public ApplyTemplate(rootNode: HTMLElement)
+        {
+            if (rootNode.attributes["data-template"] != undefined)
+            {
+                TypeScriptTools.BindingTools.EvaluateTemplate(rootNode.attributes["data-template"].nodeValue, rootNode);
+            }
+        }
+
+
+        public static SetTemplatesRecursively(rootNode : HTMLElement) : void
+        {
+            TypeScriptTools.BindingTools.ApplyTemplate(rootNode);
             var els = rootNode.getElementsByTagName("*");
             var l = els.length;
             for (var x = 0; x < l; x++)
             {
                 var node = els[x];
-                node.ApplyTemplate();
+                TypeScriptTools.BindingTools.SetTemplatesRecursively(node);
             }
         }
 
-        static SetBindings(rootNode : HTMLElement) : void
+        public static SetBindingsRecursively(rootNode : HTMLElement) : void
         {
+            TypeScriptTools.BindingTools.ApplyBinding(rootNode);
             var childrenNodes = rootNode.children;
-            var nbChildren = childrenNodes.length;
+            var nbChildren = childrenNodes.length;            
             for (var i = 0; i < nbChildren; i++)
             {
                 var node = <HTMLElement> childrenNodes[i];
-                node.Rebind();
-                TypeScriptTools.SilverTools.SetBindings(node);
+                TypeScriptTools.BindingTools.SetBindingsRecursively(node);
             }
         }
 
-        static GetParentContext(node: Node) : Node
+        private static GetParentContext(node: Node) : Node
         {
             var parentNode = node;
             while (parentNode.attributes["data-context"] == undefined)
@@ -140,9 +136,9 @@ module TypeScriptTools
             return parentNode;
         }
 
-        static knownTemplates = new Array();
+        private static knownTemplates = new Array();
 
-        static EvaluateTemplate(dataBindingAttribute, node)
+        private static EvaluateTemplate(dataBindingAttribute : HTMLElement, node: HTMLElement):void
         {
             // {TemplateBinding ?}
 
@@ -174,11 +170,11 @@ module TypeScriptTools
             // replace item of template with Name=PART_Content with the content of the item
         }
 
-        static BindingRegex = new RegExp("^\{Binding [^}]+\}");
+        private static BindingRegex = new RegExp("^\{Binding [^}]+\}");
 
-        static EvaluateDataContext(node, isCalledFromDataContext)
+        private static EvaluateDataContext(node, isCalledFromDataContext)
         {
-            var contextNode = SilverTools.GetParentContext(node);
+            var contextNode = BindingTools.GetParentContext(node);
 
             if (!isCalledFromDataContext && contextNode.attributes["data-context-value"] != undefined)
             {
@@ -191,7 +187,7 @@ module TypeScriptTools
 
                 var isHttpLink = contextExpression.StartWith("/") || contextExpression.StartWith("http://");
 
-                var elements = SilverTools.BindingRegex.exec(contextExpression);
+                var elements = BindingTools.BindingRegex.exec(contextExpression);
                 var parent = contextNode.parentNode;
 
                 if (isHttpLink == true)
@@ -203,35 +199,15 @@ module TypeScriptTools
                         for (var i = 0; i < nbElements; i++)
                         {
                             var bindingString = elements[i];
-                            var transformed = TypeScriptTools.SilverTools.EvaluateBinding(bindingString, parent, true);
+                            var transformed = TypeScriptTools.BindingTools.EvaluateBinding(bindingString, parent, true);
                             contextExpression = contextExpression.replace(bindingString, transformed);
                         }
                     }
-
-                    jQuery.ajax
-                    ({                        
-                        async: false,
-                        url: contextExpression,
-                        type: 'GET',
-                        dataType:'json',
-                        cache:false,
-                        success: function (itemsArray)
-                        {
-                            contextNode["data-context-value"] = itemsArray;
-                        },
-                        error: function (ex)
-                        {
-                            throw "Could not load data";
-                        },
-                        //complete:function(data,xhr)
-                        //{
-
-                        //}
-                    });
+                    contextNode["data-context-value"] = TypeScriptTools.FileTools.ReadJsonFile(contextExpression);
                 }
                 else if (elements != undefined)
                 {
-                    contextNode["data-context-value"] = SilverTools.EvaluateBinding(elements[0], parent, true);
+                    contextNode["data-context-value"] = BindingTools.EvaluateBinding(elements[0], parent, true);
                 }
                 else
                 {
@@ -242,9 +218,9 @@ module TypeScriptTools
         }
 
 
-        public static EvaluateBinding(bindingExpression :string, node : Node, isCalledFromDataContext : boolean) : any
+        private static EvaluateBinding(bindingExpression :string, node : Node, isCalledFromDataContext : boolean) : any
         {
-            var dataContextObject = SilverTools.EvaluateDataContext(node, isCalledFromDataContext);
+            var dataContextObject = BindingTools.EvaluateDataContext(node, isCalledFromDataContext);
 
             var parametersString = bindingExpression.TrimStartOnce("{Binding").TrimStartOnce(" ");
             parametersString = parametersString.TrimEndOnce("}");
@@ -257,7 +233,7 @@ module TypeScriptTools
             var converterParameter = undefined;
             var stringFormat = undefined;
             var mode = "OneTime";
-            var destination = "Value";
+            var destination = "Content";
             for (var i = 0; i < parameters.length; i++)
             {
                 var param = parameters[i].split('=');
@@ -276,7 +252,7 @@ module TypeScriptTools
                             source = document.getElementsByName(param[1]);
                             break;
                         case "Source":
-                            source = SilverTools.EvaluateBinding(param[1], node, false);
+                            source = BindingTools.EvaluateBinding(param[1], node, false);
                             break;
                         case "Destination":
                             destination = param[1];
@@ -323,7 +299,7 @@ module TypeScriptTools
             }
             else
             {
-                if (destination == "Value")
+                if (destination == "Content")
                 {                    
                     (<HTMLElement> node).innerHTML = value;
                 }
@@ -340,6 +316,8 @@ module TypeScriptTools
 
 $(()=> 
 {
-    TypeScriptTools.SilverTools.SetBindings(document.body);
+    TypeScriptTools.BindingTools.SetBindingsRecursively(document.body);
+
+    TypeScriptTools.BindingTools.SetTemplatesRecursively(document.body);
 });
 

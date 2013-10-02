@@ -41,9 +41,9 @@ module TypeScriptTools
             return absolteUrl+relativeUrl;
         }
 
-        public static ReadJsonFile(path: string): Object
+        public static ReadJsonFile(path: string): any
         {
-            var queryResult: string;
+            var queryResult: any;
 
             jQuery.ajax(
             {
@@ -51,17 +51,22 @@ module TypeScriptTools
                 url: path,
                 cache: false,
                 async: false,
+                //dataType:'json',
                 success: function (result)
                 {
                     queryResult = result;
                 },
                 error: function (msg)
                 {
-                    queryResult = "ERROR : " + msg;
+                    //queryResult = "ERROR : " + msg;
+                    throw new Error(msg);
                 }
+                //complete:function(data,xhr)
+                //{
+                //}
             });
 
-            return jQuery.parseJSON(queryResult);
+            return queryResult;//jQuery.parseJSON(queryResult);
         }
 
 
