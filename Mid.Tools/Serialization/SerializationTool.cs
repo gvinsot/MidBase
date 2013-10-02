@@ -16,7 +16,7 @@ namespace Mid.Tools
             using (var ms = new MemoryStream(new byte[1024]))
             {
                 Serialize(toSerialize,ms);
-                return ConvertStreamToString(ms);
+                return ConvertStreamToString(ms).TrimEnd('\0');
             }
         }
 

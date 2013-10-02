@@ -42,7 +42,7 @@ namespace WWW.ViewModels
                 context.Response.ContentType = "application/json";
 
                 var result = Factory<ISerializationTool>.New().Serialize(new toto());
-                context.Response.Write(result.Trim());
+                context.Response.Write(result);
             }
         }
 
