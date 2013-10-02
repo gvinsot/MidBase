@@ -51,7 +51,7 @@ module TypeScriptTools
                 url: path,
                 cache: false,
                 async: false,
-                //dataType:'json',
+                dataType:'json',
                 success: function (result)
                 {
                     queryResult = result;

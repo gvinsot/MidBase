@@ -11,11 +11,12 @@ module TypeScriptTools
         public Node: HTMLElement;
         private _bindedObject: any;
 
-        get BindedObject()
+        GetBindedObject(): any
         {
             return this._bindedObject;
         }
-        set BindedObject(value)
+
+        SetBindedObject(value:any)
         {                        
             this._bindedObject = value;
 
@@ -34,7 +35,7 @@ module TypeScriptTools
         {
             this.Path = path;
             this.Node = node;
-            this.BindedObject = bindedObject;
+            this.SetBindedObject(bindedObject);
         }
 
         public Dispose(): void
@@ -85,7 +86,7 @@ module TypeScriptTools
         public static Bindings : BindingGlobalContext = new BindingGlobalContext();
 
 
-        public ApplyBinding(rootNode: HTMLElement):void
+        public static ApplyBinding(rootNode: HTMLElement):void
         {
             if (rootNode.attributes["data-binding"] != undefined)
             {
@@ -93,7 +94,7 @@ module TypeScriptTools
             }
         }
 
-        public ApplyTemplate(rootNode: HTMLElement)
+        public static ApplyTemplate(rootNode: HTMLElement) :void
         {
             if (rootNode.attributes["data-template"] != undefined)
             {
@@ -104,18 +105,24 @@ module TypeScriptTools
 
         public static SetTemplatesRecursively(rootNode : HTMLElement) : void
         {
+            if (rootNode == null)
+                return;
+
             TypeScriptTools.BindingTools.ApplyTemplate(rootNode);
             var els = rootNode.getElementsByTagName("*");
             var l = els.length;
             for (var x = 0; x < l; x++)
             {
                 var node = els[x];
-                TypeScriptTools.BindingTools.SetTemplatesRecursively(node);
+                TypeScriptTools.BindingTools.SetTemplatesRecursively(<HTMLElement> node);
             }
         }
 
         public static SetBindingsRecursively(rootNode : HTMLElement) : void
         {
+            if (rootNode == null)
+                return;
+
             TypeScriptTools.BindingTools.ApplyBinding(rootNode);
             var childrenNodes = rootNode.children;
             var nbChildren = childrenNodes.length;            
@@ -203,7 +210,9 @@ module TypeScriptTools
                             contextExpression = contextExpression.replace(bindingString, transformed);
                         }
                     }
+
                     contextNode["data-context-value"] = TypeScriptTools.FileTools.ReadJsonFile(contextExpression);
+                   
                 }
                 else if (elements != undefined)
                 {

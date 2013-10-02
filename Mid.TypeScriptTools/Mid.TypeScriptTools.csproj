@@ -25,7 +25,7 @@
     <RootNamespace>Mid.TypeScriptTools</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <TypeScriptTarget>ES3</TypeScriptTarget>
+    <TypeScriptTarget>ES5</TypeScriptTarget>
     <TypeScriptIncludeComments>false</TypeScriptIncludeComments>
     <TypeScriptSourceMap>false</TypeScriptSourceMap>
   </PropertyGroup>
@@ -86,6 +86,11 @@
   <ItemGroup>
     <Content Include="SilverTools.js.map">
       <DependentUpon>BindingTools.ts</DependentUpon>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FileTools.js.map">
+      <DependentUpon>FileTools.ts</DependentUpon>
     </Content>
   </ItemGroup>
   <PropertyGroup>
