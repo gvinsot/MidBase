@@ -189,7 +189,7 @@ interface JQueryPopStateEventObject extends BaseJQueryEventObject {
     originalEvent: PopStateEvent;
 }
 
-interface JQueryEventObject extends BaseJQueryEventObject, JQueryInputEventObject, JQueryMouseEventObject, JQueryKeyEventObject, JQueryPopStateEventObject {
+interface JQueryEventObject extends BaseJQueryEventObject, /*JQueryInputEventObject, JQueryMouseEventObject, JQueryKeyEventObject,*/ JQueryPopStateEventObject {
 }
 
 /*

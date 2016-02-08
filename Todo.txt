@@ -1,0 +1,15 @@
+créé les modules api apps suivants :
+
+voir la possibiliter d'explorer des pages d'annonces avec un réseau de neurone Azure ML  pour extraire les listes d'annonces
+puis un réseau pour identifier annonce par annonce les valeurs attendues.
+
+- explore all annonces d'un site
+- parse XML pour chaque page d'annonces 
+-> obtenir titre;localisation;prix;superficie;description;photos;lien html;téléphone;email
+
+
+- deduplicate flux
+- aggréger flux
+- filtrer flux
+- générer csv du flux
+- 

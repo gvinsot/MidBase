@@ -1,0 +1,11 @@
+﻿
+<h2 data-binding="{Binding url}"></h2>
+
+<div data-context="{Binding sub}">
+
+    <a href="blank" data-binding="{Binding Path=test,Destination=href}">link</a>
+
+    <div data-source="/viewmodels/GetItems.ashx?param1={Binding foo}" data-template="/views/myTemplate.html">
+    </div>
+</div>
+

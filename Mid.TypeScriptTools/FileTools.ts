@@ -59,7 +59,7 @@ module TypeScriptTools
                 error: function (msg)
                 {
                     //queryResult = "ERROR : " + msg;
-                    throw new Error(msg);
+                    throw new Error(msg.statusText);
                 }
                 //complete:function(data,xhr)
                 //{

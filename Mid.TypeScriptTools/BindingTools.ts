@@ -1,6 +1,8 @@
 ///<reference path="StringTools.ts" />
 ///<reference path="jquery.d.ts" />
 ///<reference path="EventHandler.ts" />
+///<reference path="Interfaces.ts" />
+///<reference path="FileTools.ts" />
 
 module TypeScriptTools
 {
@@ -314,7 +316,7 @@ module TypeScriptTools
                 }
                 else
                 {
-                    node["destination"]= value;
+                    node[destination]= value;
                 }
             }
 
