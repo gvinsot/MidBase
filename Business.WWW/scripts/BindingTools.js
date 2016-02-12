@@ -62,9 +62,7 @@ var TypeScriptTools;
         }
         BindingTools.ApplyBinding = function (rootNode) {
             if (rootNode.attributes["data-binding"] != undefined) {
-                TypeScriptTools.BindingTools.EvaluateBinding(rootNode.attributes["data-binding"]["nodeValue"], rootNode, false);
-                //apply template
-                BindingTools.ApplyTemplate(rootNode);
+                TypeScriptTools.BindingTools.EvaluateBinding(rootNode.attributes["data-binding"]["nodeValue"], rootNode);
             }
         };
         BindingTools.ApplyTemplate = function (rootNode) {
@@ -77,25 +75,16 @@ var TypeScriptTools;
             node.attributes["data-template"] = uri;
             TypeScriptTools.BindingTools.ApplyTemplate(node);
         };
-        //public static SetTemplatesRecursively(rootNode: HTMLElement): void {
-        //    if (rootNode == null)
-        //        return;
-        //    TypeScriptTools.BindingTools.ApplyTemplate(rootNode);
-        //    var els = rootNode.getElementsByTagName("*");
-        //    var l = els.length;
-        //    for (var x = 0; x < l; x++) {
-        //        var node = els[x];
-        //        TypeScriptTools.BindingTools.SetTemplatesRecursively(<HTMLElement>node);
-        //    }
-        //}
         BindingTools.SetBindingsRecursively = function (rootNode, skipCurrentNode) {
             if (skipCurrentNode === void 0) { skipCurrentNode = false; }
             if (rootNode == null)
                 return;
             if (!skipCurrentNode) {
                 TypeScriptTools.BindingTools.ApplyBinding(rootNode);
-                if (rootNode.attributes["data-binding"] == undefined && rootNode.attributes["data-template"] != undefined)
+                if (rootNode.attributes["data-binding"] == undefined && rootNode.attributes["data-template"] != undefined) {
                     TypeScriptTools.BindingTools.ApplyTemplate(rootNode);
+                    return;
+                }
             }
             var childrenNodes = rootNode.children;
             var nbChildren = childrenNodes.length;
@@ -106,74 +95,95 @@ var TypeScriptTools;
         };
         BindingTools.GetParentContext = function (node) {
             var parentNode = node;
-            while (parentNode.attributes["data-context"] == undefined) {
+            while (parentNode.attributes != null && parentNode.attributes["data-context"] == undefined && parentNode.attributes["data-context-value"] == undefined) {
                 parentNode = parentNode.parentNode;
             }
+            if (parentNode.attributes == null)
+                return null;
             return parentNode;
         };
         BindingTools.EvaluateTemplate = function (bindingExpression, node) {
             var dataTemplateAttribute = node.attributes["data-template"];
             if (dataTemplateAttribute == undefined)
                 return;
-            var templateExpression = dataTemplateAttribute.nodeValue == undefined ? dataTemplateAttribute : dataTemplateAttribute.nodeValue;
-            var isHttpLink = templateExpression.StartWith("/") || templateExpression.StartWith("http://");
-            //TODO evaluate templateString
+            var dataTemplateAttributreValue = dataTemplateAttribute.nodeValue == undefined ? dataTemplateAttribute : dataTemplateAttribute.nodeValue;
+            var dataContextObject = BindingTools.EvaluateDataContext(node);
+            var templateExpression = BindingTools.EvaluateExpression(dataTemplateAttributreValue, dataContextObject, node, false);
             var templateString = TypeScriptTools.FileTools.ReadHtmlFile(templateExpression);
             node["data-template-value"] = templateString;
+            var dataSourceAttribute = node.attributes["data-source"];
             //TODO : retrive data source
-            node["data-source-value"] = null;
-            //TODO : retrieve data context
-            var datacontext = BindingTools.EvaluateDataContext(node, false);
-            //FIN DES TODO
-            node.textContent = "";
-            //let itemsList =  new HTMLUListElement();
-            //lets loop through context items
-            //for (var i = 0; i < datacontext.length; i++) {
-            //    var item = new HTMLLIElement();
-            //    var evaluatedItem = template.cloneNode(true);                
-            //    evaluatedItem.attributes["data-context-value"] = datacontext[i];
-            //    itemsList.appendChild(evaluatedItem);
-            //    BindingTools.SetBindingsRecursively(evaluatedItem as HTMLElement);                
-            //}
-            node.innerHTML = templateString;
-            BindingTools.SetBindingsRecursively(node, true);
-            //if node is a list
-            //apply template to all items
-            //else apply template once
-            // replace item of template with Name=PART_Content with the content of the item
+            if (dataSourceAttribute != undefined) {
+                var items = BindingTools.EvaluateExpression(dataSourceAttribute.nodeValue, dataContextObject, node);
+                node["data-source-value"] = items;
+                //lets loop through context items
+                for (var i = 0; i < items.length; i++) {
+                    var copyString = (new String(templateString)).toString();
+                    var wrapper = document.createElement('div');
+                    wrapper.innerHTML = copyString;
+                    var result = wrapper.firstChild;
+                    result.attributes["data-context-value"] = items[i];
+                    node.appendChild(result);
+                    BindingTools.SetBindingsRecursively(result);
+                }
+            }
+            else {
+                node.textContent = "";
+                node.innerHTML = templateString;
+                BindingTools.SetBindingsRecursively(node, true);
+            }
         };
-        BindingTools.EvaluateDataContext = function (node, isCalledFromDataContext) {
+        BindingTools.EvaluateDataContext = function (node) {
             var contextNode = BindingTools.GetParentContext(node);
-            if (!isCalledFromDataContext && contextNode.attributes["data-context-value"] != undefined) {
+            if (contextNode == undefined)
+                return null;
+            if (contextNode.attributes["data-context-value"] != undefined)
                 return contextNode.attributes["data-context-value"];
-            }
-            if (contextNode != undefined) {
-                var contextExpression = contextNode.attributes["data-context"].nodeValue;
-                var isHttpLink = contextExpression.StartWith("/") || contextExpression.StartWith("http://");
-                var elements = BindingTools.BindingRegex.exec(contextExpression);
-                var parent = contextNode.parentNode;
-                if (isHttpLink == true) {
-                    if (elements != undefined) {
-                        var nbElements = elements.length;
-                        for (var i = 0; i < nbElements; i++) {
-                            var bindingString = elements[i];
-                            var transformed = TypeScriptTools.BindingTools.EvaluateBinding(bindingString, parent, true);
-                            contextExpression = contextExpression.replace(bindingString, transformed);
-                        }
-                    }
-                    contextNode["data-context-value"] = TypeScriptTools.FileTools.ReadJsonFile(contextExpression);
-                }
-                else if (elements != undefined) {
-                    contextNode["data-context-value"] = BindingTools.EvaluateBinding(elements[0], parent, true);
-                }
-                else {
-                    contextNode["data-context-value"] = eval(contextExpression);
-                }
-                return contextNode["data-context-value"];
-            }
+            var contextExpression = contextNode.attributes["data-context"].nodeValue;
+            var datacontext = BindingTools.EvaluateDataContext(contextNode.parentNode);
+            var result = BindingTools.EvaluateExpression(contextExpression, datacontext, contextNode);
+            contextNode.attributes["data-context-value"] = result;
+            return result;
         };
-        BindingTools.EvaluateBinding = function (bindingExpression, node, isCalledFromDataContext) {
-            var dataContextObject = BindingTools.EvaluateDataContext(node, isCalledFromDataContext);
+        BindingTools.EvaluateBinding = function (bindingExpression, node) {
+            var dataContextObject = BindingTools.EvaluateDataContext(node);
+            return BindingTools.EvaluateExpression(bindingExpression, dataContextObject, node);
+        };
+        BindingTools.EvaluateExpression = function (expression, datacontext, contextNode, expectObjectResult) {
+            if (expectObjectResult === void 0) { expectObjectResult = true; }
+            var isHttpLink = expression.StartWith("/") || expression.StartWith("http://");
+            var elements = BindingTools.BindingRegex.exec(expression);
+            var parent = contextNode.parentNode;
+            if (isHttpLink == true) {
+                if (elements != undefined) {
+                    var nbElements = elements.length;
+                    for (var i = 0; i < nbElements; i++) {
+                        var bindingString = elements[i];
+                        var transformed = TypeScriptTools.BindingTools.EvaluateBindingExpression(bindingString, datacontext, parent);
+                        expression = expression.replace(bindingString, transformed);
+                    }
+                }
+                if (!expectObjectResult)
+                    return expression;
+                else
+                    return TypeScriptTools.FileTools.ReadJsonFile(expression);
+            }
+            else if (elements != undefined) {
+                var result = [];
+                for (var i = 0; i < elements.length; i++) {
+                    result[i] = BindingTools.EvaluateBindingExpression(elements[0], datacontext, contextNode);
+                }
+                if (result.length == 1)
+                    return result[0];
+                else
+                    return result;
+            }
+            else {
+                return eval(expression);
+            }
+            return null;
+        };
+        BindingTools.EvaluateBindingExpression = function (bindingExpression, dataContextObject, node) {
             var parametersString = bindingExpression.TrimStartOnce("{Binding").TrimStartOnce(" ");
             parametersString = parametersString.TrimEndOnce("}");
             var parameters = parametersString.split(",");
@@ -185,6 +195,7 @@ var TypeScriptTools;
             var stringFormat = undefined;
             var mode = "OneTime";
             var destination = "Content";
+            var externEffects = false;
             for (var i = 0; i < parameters.length; i++) {
                 var param = parameters[i].split('=');
                 if (param.length == 1) {
@@ -199,10 +210,11 @@ var TypeScriptTools;
                             source = document.getElementsByName(param[1]);
                             break;
                         case "Source":
-                            source = BindingTools.EvaluateBinding(param[1], node, false);
+                            source = BindingTools.EvaluateBinding(param[1], node);
                             break;
                         case "Destination":
                             destination = param[1];
+                            externEffects = true;
                             break;
                         case "Converter":
                             converter = param[1];
@@ -228,17 +240,19 @@ var TypeScriptTools;
             }
             var value;
             if (source != undefined) {
-                value = source[path];
+                var sourceString = Object.prototype.toString.call(source) === '[object Array]' ? 'source' : 'source.';
+                value = eval(sourceString + path);
             }
             else {
                 value = source;
             }
             //todo : apply converter and stringformat
             //if node is input and mode == twoway then attach events
-            if (isCalledFromDataContext == true) {
-                node["data-context-value"] = value;
-            }
-            else {
+            // if (isCalledFromDataContext == true) {
+            //     return value;
+            //}
+            //    else 
+            if (externEffects) {
                 if (destination == "Content") {
                     node.innerHTML = value;
                 }
@@ -250,7 +264,7 @@ var TypeScriptTools;
         };
         BindingTools.Bindings = new BindingGlobalContext();
         BindingTools.knownTemplates = new Array();
-        BindingTools.BindingRegex = new RegExp("^\{Binding [^}]+\}");
+        BindingTools.BindingRegex = new RegExp("{Binding[^}]*\}");
         return BindingTools;
     })();
     TypeScriptTools.BindingTools = BindingTools;

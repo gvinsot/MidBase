@@ -13,7 +13,7 @@
     <%=Scripts%>
 </head>
 
-<body data-context="/viewmodels/Test.ashx" style="height: 100%">
+<body data-context="/raw/subscriptions.json" style="height: 100%">
 
     <div style="position: relative; padding-left: 17px; padding-top: 6px; font-size: large; width: 100%; background: #000000; height: 40px; color: white">
         Business Builder

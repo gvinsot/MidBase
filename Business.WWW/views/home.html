@@ -1,11 +1,12 @@
 ﻿
-<h2 data-binding="{Binding url}"></h2>
+<h2>Coucou</h2>
 
-<div data-context="{Binding sub}">
+<div data-context="/raw/subscriptions.json">
+    
+    <a href="blank" data-binding="{Binding Path=value[0].id,Destination=href}{Binding Path=value[0].id,Destination=Content}">link</a>
 
-    <a href="blank" data-binding="{Binding Path=test,Destination=href}">link</a>
+    <div data-source="{Binding Path=value}" data-template="/views/item.html" data-context="/raw/{Binding Path=value[0].id}/resourceGroups.json">
 
-    <div data-source="/viewmodels/GetItems.ashx?param1={Binding foo}" data-template="/views/myTemplate.html">
     </div>
 </div>
 
