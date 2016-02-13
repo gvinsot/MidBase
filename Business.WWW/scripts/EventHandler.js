@@ -1,7 +1,7 @@
 ///
 // Module
-var TypeScriptTools;
-(function (TypeScriptTools) {
+var SilverScriptTools;
+(function (SilverScriptTools) {
     // Class
     var EventHandler = (function () {
         // Constructor
@@ -38,6 +38,6 @@ var TypeScriptTools;
         };
         return EventHandler;
     })();
-    TypeScriptTools.EventHandler = EventHandler;
-})(TypeScriptTools || (TypeScriptTools = {}));
+    SilverScriptTools.EventHandler = EventHandler;
+})(SilverScriptTools || (SilverScriptTools = {}));
 //# sourceMappingURL=EventHandler.js.map

@@ -29,6 +29,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Global.asax" />
+    <Content Include="RestServices.txt" />
     <Content Include="scripts\libs\jquery.js" />
     <Content Include="styles\app.css" />
   </ItemGroup>
@@ -117,6 +118,8 @@
     <Content Include="styles\bootstrap.css" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="views\GetStarted.html" />
+    <Content Include="views\item2.html" />
     <Content Include="views\item.html" />
     <Content Include="views\home.html" />
     <Content Include="views\Page2.html" />

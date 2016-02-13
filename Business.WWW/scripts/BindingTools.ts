@@ -4,7 +4,7 @@
 ///<reference path="Interfaces.ts" />
 ///<reference path="FileTools.ts" />
 
-module TypeScriptTools {
+module SilverScriptTools {
 
     export class Binding implements IDisposable {
         public Path: string;
@@ -24,7 +24,7 @@ module TypeScriptTools {
         }
 
         UpdateNodeOnContextChange(): void {
-            TypeScriptTools.BindingTools.ApplyBinding(this.Node);
+            BindingTools.ApplyBinding(this.Node);
         }
 
         constructor(path: string, node: HTMLElement, bindedObject: any) {
@@ -46,26 +46,47 @@ module TypeScriptTools {
         CurrentBindingId: number = 0;
 
         AddBinding(bindedObject: any, path: string, node: HTMLElement): void {
-            if (node["BindingId"] == undefined) {
-                this.CurrentBindingId++;
-                node["BindingId"] = this.CurrentBindingId;
+            if (node["data-binding-ids"] == undefined) {
+                node["data-binding-ids"] = [];               
             }
-            var bindingId = node["BindingId"];
-
+            this.CurrentBindingId++;
+            var bindingsIds = node["data-binding-ids"];
+            var length = bindingsIds.length;
+            var bindingId = this.CurrentBindingId;
+            bindingsIds[length] = bindingId;
+            
             var binding = new Binding(path, node, bindedObject);
 
             this.BindingDictionary[bindingId] = binding;
         }
 
-        RemoveBinding(bindedObject, path, node) {
-            if (node["BindingId"] != undefined) {
-                var bindingId = node["BindingId"];
-                var binding = <Binding>this.BindingDictionary[bindingId];
-                binding.Dispose();
-                binding = null;
-                this.BindingDictionary[bindingId] = null;
-            }
+        DisposeBindings(node) {
+            if (node.attributes != undefined && node.attributes != null) {
+                if (node.attributes["data-binding-value"] != undefined) {
+                    node.attributes["data-binding-value"] = null;
+                }
+                if (node.attributes["data-context-value"] != undefined) {
+                    node.attributes["data-context-value"] = null;
+                }
+                if (node.attributes["data-template-value"] != undefined) {
+                    node.attributes["data-template-value"] = null;
+                }
+                if (node.attributes["data-source-value"] != undefined) {
+                    node.attributes["data-source-value"] = null;
+                }
+                if (node.attributes["data-binding-ids"] != undefined) {
+                    var bindingsIds = node["data-binding-ids"];
+                    for (var i = 0; i < bindingsIds.length; i++) {
+                        var bindingId = bindingsIds[i];
+                        var binding = <Binding>this.BindingDictionary[bindingId];
+                        binding.Dispose();
+                        binding = null;
+                        this.BindingDictionary[bindingId] = null;
+                    }
+                }
+            }          
         }
+        
     }
 
 
@@ -75,7 +96,7 @@ module TypeScriptTools {
 
         public static ApplyBinding(rootNode: HTMLElement): void {
             if (rootNode.attributes["data-binding"] != undefined) {
-                TypeScriptTools.BindingTools.EvaluateBinding(rootNode.attributes["data-binding"]["nodeValue"], rootNode);
+                SilverScriptTools.BindingTools.EvaluateBinding(rootNode.attributes["data-binding"]["nodeValue"], rootNode);
                 //apply template
                 //BindingTools.ApplyTemplate(rootNode);
             }
@@ -83,14 +104,30 @@ module TypeScriptTools {
 
         public static ApplyTemplate(rootNode: Node): void {
             if (rootNode.attributes["data-template"] != undefined) {
-                TypeScriptTools.BindingTools.EvaluateTemplate(rootNode.attributes["data-template"]["nodeValue"], rootNode);
+                SilverScriptTools.BindingTools.EvaluateTemplate(rootNode.attributes["data-template"]["nodeValue"], rootNode);
             }
         }
 
         public static SetContent(targetNode: string, uri: string) {
             var node = document.getElementById(targetNode);
+
+            BindingTools.DisposeBindingsRecursively(node, true);
             node.attributes["data-template"] = uri;
-            TypeScriptTools.BindingTools.ApplyTemplate(node);                
+            SilverScriptTools.BindingTools.ApplyTemplate(node);                
+        }
+
+        public static DisposeBindingsRecursively(rootNode: HTMLElement, skiprootNode: boolean = false): void {
+            if (rootNode == null)
+                return;
+            if(!skiprootNode)
+                BindingTools.Bindings.DisposeBindings(rootNode);
+
+            var childrenNodes = rootNode.children;
+            var nbChildren = childrenNodes.length;
+            for (var i = 0; i < nbChildren; i++) {
+                var node = <HTMLElement>childrenNodes[i];
+                BindingTools.DisposeBindingsRecursively(node);
+            }
         }
         
         public static SetBindingsRecursively(rootNode: HTMLElement, skipCurrentNode:boolean =false): void {
@@ -98,9 +135,9 @@ module TypeScriptTools {
                 return;
 
             if (!skipCurrentNode) {
-                TypeScriptTools.BindingTools.ApplyBinding(rootNode);
+                SilverScriptTools.BindingTools.ApplyBinding(rootNode);
                 if (rootNode.attributes["data-binding"] == undefined && rootNode.attributes["data-template"] != undefined) {
-                    TypeScriptTools.BindingTools.ApplyTemplate(rootNode);
+                    SilverScriptTools.BindingTools.ApplyTemplate(rootNode);
                     return;
                 }
             }
@@ -109,7 +146,7 @@ module TypeScriptTools {
             var nbChildren = childrenNodes.length;
             for (var i = 0; i < nbChildren; i++) {
                 var node = <HTMLElement>childrenNodes[i];
-                TypeScriptTools.BindingTools.SetBindingsRecursively(node);
+                SilverScriptTools.BindingTools.SetBindingsRecursively(node);
             }
         }
 
@@ -124,7 +161,7 @@ module TypeScriptTools {
             return parentNode;
         }
 
-        private static knownTemplates = new Array();
+       // private static knownTemplates = new Array();
 
         private static EvaluateTemplate(bindingExpression: string, node: Node): void {
          
@@ -134,7 +171,7 @@ module TypeScriptTools {
             var dataTemplateAttributreValue = dataTemplateAttribute.nodeValue == undefined ? dataTemplateAttribute : dataTemplateAttribute.nodeValue;
             var dataContextObject = BindingTools.EvaluateDataContext(node);
             var templateExpression = BindingTools.EvaluateExpression(dataTemplateAttributreValue, dataContextObject,node,false);            
-            var templateString = TypeScriptTools.FileTools.ReadHtmlFile(templateExpression);
+            var templateString = FileTools.ReadHtmlFile(templateExpression);
             node["data-template-value"] = templateString;
 
             var dataSourceAttribute = node.attributes["data-source"];
@@ -189,34 +226,39 @@ module TypeScriptTools {
 
             return BindingTools.EvaluateExpression(bindingExpression, dataContextObject, node)
         }
-
-        private static BindingRegex = new RegExp("{Binding[^}]*\}");
-
+       
         private static EvaluateExpression(expression: string, datacontext: any, contextNode: Node, expectObjectResult: boolean = true): any {
 
-            var isHttpLink = expression.StartWith("/") || expression.StartWith("http://");
-            var elements = BindingTools.BindingRegex.exec(expression);
+            var isHttpLink = expression.StartWith("/") || expression.StartWith("http://") || expression.StartWith("https://");
+            var elements = [];
+            var matches;
+            var regex = /({Binding[^}]*})/g;
+            var i = 0;
+           
+            while ((matches = regex.exec(expression)) != null) {
+                elements[i] = matches[1];
+                i++;
+            }
             var parent = contextNode.parentNode;
+            var nbElements = elements.length;
 
             if (isHttpLink == true) {
-                if (elements != undefined) {
-                    var nbElements = elements.length;
-
-                    for (var i = 0; i < nbElements; i++) {
-                        var bindingString = elements[i];
-                        var transformed = TypeScriptTools.BindingTools.EvaluateBindingExpression(bindingString,datacontext, parent);
-                        expression = expression.replace(bindingString, transformed);
-                    }
+                
+                for (var i = 0; i < nbElements; i++) {
+                    var bindingString = elements[i];
+                    var transformed = SilverScriptTools.BindingTools.EvaluateBindingExpression(bindingString,datacontext, parent);
+                    expression = expression.replace(bindingString, transformed);
                 }
+                
                 if (!expectObjectResult)
                     return expression;
                 else
-                    return TypeScriptTools.FileTools.ReadJsonFile(expression);          
+                    return SilverScriptTools.FileTools.ReadJsonFile(expression);          
             }
-            else if (elements != undefined) {
+            else if (nbElements>0) {
                 let result = [];
-                for (var i = 0; i < elements.length; i++) {
-                    result[i]=  BindingTools.EvaluateBindingExpression(elements[0], datacontext, contextNode);
+                for (var i = 0; i < nbElements; i++) {
+                    result[i]=  BindingTools.EvaluateBindingExpression(elements[i], datacontext, contextNode);
                 }
                 if (result.length == 1)
                     return result[0];
@@ -323,6 +365,6 @@ module TypeScriptTools {
 }
 
 $(() => {
-    TypeScriptTools.BindingTools.SetBindingsRecursively(document.body);
+    SilverScriptTools.BindingTools.SetBindingsRecursively(document.body);
 });
 

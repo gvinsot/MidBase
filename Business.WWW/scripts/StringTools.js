@@ -1,35 +1,35 @@
 $.extend(String.prototype, {
     StartWith: function (stringToTest) {
-        return TypeScriptTools.StringTools.StartWith(this, stringToTest);
+        return SilverScriptTools.StringTools.StartWith(this, stringToTest);
     }
 });
 $.extend(String.prototype, {
     EndWith: function (stringToTest) {
-        return TypeScriptTools.StringTools.EndWith(this, stringToTest);
+        return SilverScriptTools.StringTools.EndWith(this, stringToTest);
     }
 });
 $.extend(String.prototype, {
     TrimStart: function (toTrim) {
-        return TypeScriptTools.StringTools.TrimStart(this, toTrim);
+        return SilverScriptTools.StringTools.TrimStart(this, toTrim);
     }
 });
 $.extend(String.prototype, {
     TrimEnd: function (toTrim) {
-        return TypeScriptTools.StringTools.TrimEnd(this, toTrim);
+        return SilverScriptTools.StringTools.TrimEnd(this, toTrim);
     }
 });
 $.extend(String.prototype, {
     TrimEndOnce: function (toTrim) {
-        return TypeScriptTools.StringTools.TrimEndOnce(this, toTrim);
+        return SilverScriptTools.StringTools.TrimEndOnce(this, toTrim);
     }
 });
 $.extend(String.prototype, {
     TrimStartOnce: function (toTrim) {
-        return TypeScriptTools.StringTools.TrimStartOnce(this, toTrim);
+        return SilverScriptTools.StringTools.TrimStartOnce(this, toTrim);
     }
 });
-var TypeScriptTools;
-(function (TypeScriptTools) {
+var SilverScriptTools;
+(function (SilverScriptTools) {
     var StringTools = (function () {
         function StringTools() {
         }
@@ -73,6 +73,6 @@ var TypeScriptTools;
         };
         return StringTools;
     })();
-    TypeScriptTools.StringTools = StringTools;
-})(TypeScriptTools || (TypeScriptTools = {}));
+    SilverScriptTools.StringTools = StringTools;
+})(SilverScriptTools || (SilverScriptTools = {}));
 //# sourceMappingURL=StringTools.js.map

@@ -1,6 +1,6 @@
 ﻿///<reference path="FileTools.ts"/>
 // Module
-module TypeScriptTools {
+module SilverScriptTools {
     //Class
     export class ObjectTools {
         static CheckFileAPI(): boolean {

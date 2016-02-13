@@ -1,6 +1,6 @@
 ﻿///<reference path="libs/jquery.d.ts"/>
 // Module
-module TypeScriptTools {
+module SilverScriptTools {
 
     //Class
     export class FileTools {

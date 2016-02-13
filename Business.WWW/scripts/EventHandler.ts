@@ -1,7 +1,7 @@
 ﻿///
 
 // Module
-module TypeScriptTools {
+module SilverScriptTools {
     export interface delegate {
         (): void;
     }

@@ -1,7 +1,7 @@
 ///<reference path="libs/jquery.d.ts"/>
 // Module
-var TypeScriptTools;
-(function (TypeScriptTools) {
+var SilverScriptTools;
+(function (SilverScriptTools) {
     //Class
     var FileTools = (function () {
         function FileTools() {
@@ -68,6 +68,6 @@ var TypeScriptTools;
         };
         return FileTools;
     })();
-    TypeScriptTools.FileTools = FileTools;
-})(TypeScriptTools || (TypeScriptTools = {}));
+    SilverScriptTools.FileTools = FileTools;
+})(SilverScriptTools || (SilverScriptTools = {}));
 //# sourceMappingURL=FileTools.js.map

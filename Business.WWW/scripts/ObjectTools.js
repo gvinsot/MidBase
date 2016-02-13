@@ -1,7 +1,7 @@
 ///<reference path="FileTools.ts"/>
 // Module
-var TypeScriptTools;
-(function (TypeScriptTools) {
+var SilverScriptTools;
+(function (SilverScriptTools) {
     //Class
     var ObjectTools = (function () {
         function ObjectTools() {
@@ -24,13 +24,13 @@ var TypeScriptTools;
             return result.length != 0;
         };
         ObjectTools.ConvertJsonToDate = function (sourceString) {
-            var trimed = TypeScriptTools.StringTools.TrimStart(sourceString, "/Date(");
-            trimed = TypeScriptTools.StringTools.TrimEnd(trimed, ")/");
-            trimed = TypeScriptTools.StringTools.TrimEnd(trimed, "+0000");
+            var trimed = SilverScriptTools.StringTools.TrimStart(sourceString, "/Date(");
+            trimed = SilverScriptTools.StringTools.TrimEnd(trimed, ")/");
+            trimed = SilverScriptTools.StringTools.TrimEnd(trimed, "+0000");
             return new Date(parseInt(trimed));
         };
         ObjectTools.ConvertJsonTimeSpanToDate = function (sourceString) {
-            var trimed = TypeScriptTools.StringTools.TrimStart(sourceString, "PT");
+            var trimed = SilverScriptTools.StringTools.TrimStart(sourceString, "PT");
             var hours = 0;
             var minutes = 0;
             var seconds = 0;
@@ -44,7 +44,7 @@ var TypeScriptTools;
                 minutes = parseInt(splitted[0]);
                 trimed = splitted[1];
             }
-            trimed = TypeScriptTools.StringTools.TrimEnd(trimed, "S");
+            trimed = SilverScriptTools.StringTools.TrimEnd(trimed, "S");
             seconds = parseInt(trimed);
             return new Date(hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000);
         };
@@ -94,6 +94,6 @@ var TypeScriptTools;
         };
         return ObjectTools;
     })();
-    TypeScriptTools.ObjectTools = ObjectTools;
-})(TypeScriptTools || (TypeScriptTools = {}));
+    SilverScriptTools.ObjectTools = ObjectTools;
+})(SilverScriptTools || (SilverScriptTools = {}));
 //# sourceMappingURL=ObjectTools.js.map
