@@ -55,32 +55,35 @@ module SilverScriptTools {
                     //}
                 });
 
-            return queryResult;//jQuery.parseJSON(queryResult);
+            return queryResult;
         }
 
 
-        public static ReadHtmlFile(path: string): any {
+        public static ReadHtmlFile(path: string, delegate = null, delegateParameters: any[] =null): any {
             var queryResult: any;
 
             jQuery.ajax(
                 {
                     type: "GET",
                     url: path,
-                    async: false,
+                    async: delegate!=null,
                     dataType: 'html',
                     success: function (result) {
-                        queryResult = result;
+                        
+                        if (delegate != null) {
+                            delegate(result, delegateParameters);
+                        }
+                        else {
+                            queryResult = result;
+                        }
                     },
                     error: function (msg) {
                         //queryResult = "ERROR : " + msg;
                         throw new Error(msg.statusText);
-                    }
-                    //complete:function(data,xhr)
-                    //{
-                    //}
+                    }                    
                 });
 
-            return queryResult;//jQuery.parseJSON(queryResult);
+            return queryResult;
         }
 
 

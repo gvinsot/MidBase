@@ -135,9 +135,9 @@ module SilverScriptTools {
                 return;
 
             if (!skipCurrentNode) {
-                SilverScriptTools.BindingTools.ApplyBinding(rootNode);
+                BindingTools.ApplyBinding(rootNode);
                 if (rootNode.attributes["data-binding"] == undefined && rootNode.attributes["data-template"] != undefined) {
-                    SilverScriptTools.BindingTools.ApplyTemplate(rootNode);
+                    BindingTools.ApplyTemplate(rootNode);
                     return;
                 }
             }
@@ -146,7 +146,7 @@ module SilverScriptTools {
             var nbChildren = childrenNodes.length;
             for (var i = 0; i < nbChildren; i++) {
                 var node = <HTMLElement>childrenNodes[i];
-                SilverScriptTools.BindingTools.SetBindingsRecursively(node);
+                BindingTools.SetBindingsRecursively(node);
             }
         }
 
@@ -170,28 +170,31 @@ module SilverScriptTools {
                 return;
             var dataTemplateAttributreValue = dataTemplateAttribute.nodeValue == undefined ? dataTemplateAttribute : dataTemplateAttribute.nodeValue;
             var dataContextObject = BindingTools.EvaluateDataContext(node);
-            var templateExpression = BindingTools.EvaluateExpression(dataTemplateAttributreValue, dataContextObject,node,false);            
-            var templateString = FileTools.ReadHtmlFile(templateExpression);
-            node["data-template-value"] = templateString;
+            var templateExpression = BindingTools.EvaluateExpression(dataTemplateAttributreValue, dataContextObject, node, false);
+            FileTools.ReadHtmlFile(templateExpression, BindingTools.EvaluateTemplatePart2, [ node, dataContextObject]);            
+        }
 
+        private static EvaluateTemplatePart2(templateString: string, args: any[]) {
+            var node: Node = args[0];
+            var dataContextObject: Object = args[1];
+            node["data-template-value"] = templateString;
             var dataSourceAttribute = node.attributes["data-source"];
-            //TODO : retrive data source
             if (dataSourceAttribute != undefined) {
 
-                var items = BindingTools.EvaluateExpression(dataSourceAttribute.nodeValue,dataContextObject,node);
+                var items = BindingTools.EvaluateExpression(dataSourceAttribute.nodeValue, dataContextObject, node);
                 node["data-source-value"] = items;
-
+                var itemsLength = items.length;
                 //lets loop through context items
-                for (var i = 0; i < items.length; i++) {
+                for (var i = 0; i < itemsLength; i++) {
 
-                    var copyString = (new String(templateString)).toString();    
+                    var copyString = (new String(templateString)).toString();
                     var wrapper = document.createElement('div');
                     wrapper.innerHTML = copyString;
                     var result = wrapper.firstChild;
                     result.attributes["data-context-value"] = items[i];
-                    node.appendChild(result);
-                    BindingTools.SetBindingsRecursively(result as HTMLElement);                
-                }            
+                    node.appendChild(result);                    
+                }
+                BindingTools.SetBindingsRecursively(node as HTMLElement,true);
             }
             else {
                 node.textContent = "";
@@ -199,7 +202,6 @@ module SilverScriptTools {
                 BindingTools.SetBindingsRecursively(node as HTMLElement, true);
             }
         }
-
         
         private static EvaluateDataContext(node): Object {
             var contextNode = BindingTools.GetParentContext(node);
@@ -246,14 +248,14 @@ module SilverScriptTools {
                 
                 for (var i = 0; i < nbElements; i++) {
                     var bindingString = elements[i];
-                    var transformed = SilverScriptTools.BindingTools.EvaluateBindingExpression(bindingString,datacontext, parent);
+                    var transformed = BindingTools.EvaluateBindingExpression(bindingString,datacontext, parent);
                     expression = expression.replace(bindingString, transformed);
                 }
                 
                 if (!expectObjectResult)
                     return expression;
                 else
-                    return SilverScriptTools.FileTools.ReadJsonFile(expression);          
+                    return FileTools.ReadJsonFile(expression);          
             }
             else if (nbElements>0) {
                 let result = [];
@@ -272,7 +274,7 @@ module SilverScriptTools {
         }
 
 
-        private static EvaluateBindingExpression(bindingExpression: string, dataContextObject:any, node: Node): any {
+        private static EvaluateBindingExpression(bindingExpression: string, dataContextObject: any, node: Node, allowSideEffects: boolean=true): any {
 
             var parametersString = bindingExpression.TrimStartOnce("{Binding").TrimStartOnce(" ");
             parametersString = parametersString.TrimEndOnce("}");
@@ -286,7 +288,8 @@ module SilverScriptTools {
             var stringFormat = undefined;
             var mode = "OneTime";
             var destination = "Content";
-            var externEffects = false;
+            var hasSideEffects = false;
+            var pathDefined = false;
             for (var i = 0; i < parameters.length; i++) {
                 var param = parameters[i].split('=');
 
@@ -297,6 +300,7 @@ module SilverScriptTools {
                     switch (param[0]) {
                         case "Path":
                             path = param[1];
+                            pathDefined = true;
                             break;
                         case "ElementName":
                             source = document.getElementsByName(param[1]);
@@ -306,7 +310,7 @@ module SilverScriptTools {
                             break;
                         case "Destination":
                             destination = param[1];
-                            externEffects = true;
+                            hasSideEffects = true;
                             break;
                         case "Converter":
                             converter = param[1];
@@ -332,23 +336,23 @@ module SilverScriptTools {
             }
             var value;
 
-            if (source != undefined) {
+            if (source != undefined && pathDefined) {
                 var sourceString = Object.prototype.toString.call(source) === '[object Array]' ? 'source' : 'source.'; 
-                value = eval(sourceString + path);
-                
+                value = eval(sourceString + path);    
             }
             else {
                 value = source;
             }
             //todo : apply converter and stringformat
 
-            //if node is input and mode == twoway then attach events
-
-           // if (isCalledFromDataContext == true) {
-           //     return value;
-            //}
-            //    else 
-            if (externEffects)
+            if (mode == "OneWay") {
+                BindingTools.Bindings.AddBinding(dataContextObject, path, node as HTMLElement);
+            } else if (mode == "TwoWay") {
+                BindingTools.Bindings.AddBinding(dataContextObject, path, node as HTMLElement);
+                //TODO
+                //if node is input and mode == twoway then attach events
+            }
+            if (hasSideEffects && allowSideEffects)
             {
                 if (destination == "Content") {
                     (<HTMLElement>node).innerHTML = value;
@@ -357,8 +361,6 @@ module SilverScriptTools {
                     node.attributes[destination].value = value;
                 }
             }
-
-
             return value;
         }
     }

@@ -21,6 +21,11 @@ namespace WWW
                 routeTemplate: "api/{resource}/{*id}",
                 defaults: new { controller="api"}
             );
+            config.Routes.MapHttpRoute(
+                name: "OtherApi",
+                routeTemplate: "services/{controller}",
+                defaults: new {}
+            );
         }
     }
 }

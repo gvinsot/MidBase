@@ -47,24 +47,31 @@ var SilverScriptTools;
                     throw new Error(msg.statusText);
                 }
             });
-            return queryResult; //jQuery.parseJSON(queryResult);
+            return queryResult;
         };
-        FileTools.ReadHtmlFile = function (path) {
+        FileTools.ReadHtmlFile = function (path, delegate, delegateParameters) {
+            if (delegate === void 0) { delegate = null; }
+            if (delegateParameters === void 0) { delegateParameters = null; }
             var queryResult;
             jQuery.ajax({
                 type: "GET",
                 url: path,
-                async: false,
+                async: delegate != null,
                 dataType: 'html',
                 success: function (result) {
-                    queryResult = result;
+                    if (delegate != null) {
+                        delegate(result, delegateParameters);
+                    }
+                    else {
+                        queryResult = result;
+                    }
                 },
                 error: function (msg) {
                     //queryResult = "ERROR : " + msg;
                     throw new Error(msg.statusText);
                 }
             });
-            return queryResult; //jQuery.parseJSON(queryResult);
+            return queryResult;
         };
         return FileTools;
     })();
